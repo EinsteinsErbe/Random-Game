@@ -11,7 +11,7 @@ public class Genotype extends RandomElement implements Evolvable<Genotype>, Comp
 	private TerminationChromosome terminations;
 	private MappingChromosome mapping;
 	private LevelChromosome level;
-	
+
 	private double fitness;
 
 	private Chromosome<?,?>[] chromosomes;
@@ -31,10 +31,27 @@ public class Genotype extends RandomElement implements Evolvable<Genotype>, Comp
 		chromosomes[2] =  terminations;
 		chromosomes[3] = mapping;
 		chromosomes[4] = level;
-		
+
 		fitness = 0;
-		
+
 		newInstance();
+	}
+
+	public Genotype(Genotype g) {
+		sprites = g.getSprites().clone();
+		interactions = g.getInteractions().clone();
+		terminations = g.getTerminations().clone();
+		mapping = g.getMapping().clone();
+		level = g.getLevel().clone();
+
+		chromosomes = new Chromosome[NUM_CHROMOSOMES];
+		chromosomes[0] = sprites;
+		chromosomes[1] = interactions;
+		chromosomes[2] =  terminations;
+		chromosomes[3] = mapping;
+		chromosomes[4] = level;
+
+		this.fitness = g.getFitness();
 	}
 
 	@Override
@@ -44,19 +61,24 @@ public class Genotype extends RandomElement implements Evolvable<Genotype>, Comp
 
 	@Override
 	public Genotype crossover(Genotype genotype) {
+		/* AVOID INZEST?
+		if(this.equals(genotype)) {
+			System.out.println("INZEST");
+			return this;
+		}
+		*/
+		Genotype g = new Genotype(this);
+
 		int i = random.nextInt(NUM_CHROMOSOMES);
 		switch(i) {
-		case 0: getSprites().crossover(genotype.getSprites()); break;
-		case 1: getInteractions().crossover(genotype.getInteractions()); break;
-		case 2: getTerminations().crossover(genotype.getTerminations()); break;
-		case 3: getMapping().crossover(genotype.getMapping()); break;
-		case 4: getLevel().crossover(genotype.getLevel()); break;
+		case 0: g.getSprites().crossover(genotype.getSprites()); break;
+		case 1: g.getInteractions().crossover(genotype.getInteractions()); break;
+		case 2: g.getTerminations().crossover(genotype.getTerminations()); break;
+		case 3: g.getMapping().crossover(genotype.getMapping()); break;
+		case 4: g.getLevel().crossover(genotype.getLevel()); break;
 		default: break;
 		}
-		//TODO
-		System.out.println(this+" + "+genotype);
-		Genotype g = new Genotype();
-		g.calcFitness(0);
+
 		return g;
 	}
 
@@ -64,11 +86,15 @@ public class Genotype extends RandomElement implements Evolvable<Genotype>, Comp
 	public void newInstance() {
 		Arrays.stream(chromosomes).forEach(c -> c.newInstance());
 	}
-	
+
 	public void calcFitness(long seed) {
+		//TODO
 		//spiel parsen
 		//eval funktion mit mcts (parallel)
-		fitness += random.nextInt(100);
+		fitness = 0;
+		for (String s : mapping.genes) {
+			fitness += Integer.parseInt(s);
+		}
 	}
 
 	public Chromosome<?, ?> getChromosome(int i){
@@ -102,5 +128,20 @@ public class Genotype extends RandomElement implements Evolvable<Genotype>, Comp
 
 	public double getFitness() {
 		return fitness;
+	}
+
+	public Genotype clone() {
+		return new Genotype(this);
+	}
+
+	public void showDetails() {
+		System.out.println("======================================================");
+		System.out.println(this);
+		System.out.println("Fitness: "+fitness);
+		for (Chromosome<?, ?> c : chromosomes) {
+			System.out.println();
+			c.showDetails();
+		}
+		System.out.println("======================================================");
 	}
 }

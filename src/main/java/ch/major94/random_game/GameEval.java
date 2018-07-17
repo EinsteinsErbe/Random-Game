@@ -2,6 +2,7 @@ package ch.major94.random_game;
 
 import java.lang.reflect.Constructor;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import core.game.StateObservation;
 import core.player.AbstractPlayer;
@@ -17,34 +18,38 @@ public class GameEval {
 	private double score;
 	private boolean win;
 	private int steps;
+	private AtomicBoolean winnerFound;
 	
 	private int id;
 
-	public GameEval(int id) {
+	public GameEval(int id, AtomicBoolean winnerFound) {
 		this.id = id;
+		this.winnerFound = winnerFound;
 	}
 
-	public void simulate(int maxFrames, String agentName, int agentTime, int seed, boolean saveActions) {
+	public boolean simulate(int maxFrames, String agentName, int agentTime, int seed, boolean saveActions) {
 		//System.out.println("start agent "+id);
 		AbstractPlayer a;
 		try {
 			state.setNewSeed(seed);
 			a = createAgent(agentName, state);
 			a.setup("actions"+id+".txt", seed, false);
-			int res = getAgentResult(state, 2000, agentTime, a);
+			int res = getAgentResult(state, maxFrames, agentTime, a);
 			if(saveActions) {
 				a.teardown(state);
 			}
 			win = state.getGameWinner().equals(Types.WINNER.PLAYER_WINS);
 			score = state.getGameScore() + (win ? WIN_BONUS : 0);
 			steps = res;
+			return win;
 			//System.out.println("Agent "+id+": "+res+" frames | "+state.getGameScore()+" points, "+state.getGameWinner()+" => "+score);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return false;
 	}
 	
-	private static int getAgentResult(StateObservation stateObs, int steps, int agentTime, AbstractPlayer agent){
+	private int getAgentResult(StateObservation stateObs, int steps, int agentTime, AbstractPlayer agent){
 		int k = 0;
 		int i;
 		for(i=0;i<steps;i++){
@@ -58,7 +63,7 @@ public class GameEval {
 			agent.logAction(bestAction);
 			//k += checkIfOffScreen(stateObs);
 
-			if(stateObs.isGameOver()){
+			if(stateObs.isGameOver() || winnerFound.get()){
 				break;
 			}
 

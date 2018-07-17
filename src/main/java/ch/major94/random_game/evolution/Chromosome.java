@@ -6,12 +6,14 @@ public abstract class Chromosome<T extends Chromosome<T,G>, G> extends RandomEle
 	
 	protected ArrayList<G> genes;
 	
+	protected ChromosomeType type = ChromosomeType.NONE;
+	
 	public Chromosome(){
 		super();
 		
 		genes = new ArrayList<>();
 		
-		newInstance();
+		//newInstance();
 	}
 	
 	public G getGene(int i) {
@@ -33,14 +35,24 @@ public abstract class Chromosome<T extends Chromosome<T,G>, G> extends RandomEle
 		return random.nextInt(genes.size());
 	}
 	
+	public G getRandomGene() {
+		return getGene(getRandonGeneI());
+	}
+	
 	@Override
 	public Chromosome<T, G> crossover(Chromosome<T,G> chromosome) {
-		int i = getRandonGeneI();
-		G gene = chromosome.replaceRandomGene(genes.remove(i));
-		genes.add(i, gene);
-		//TODO
-		return chromosome;
+		replaceRandomGene(chromosome.getRandomGene());
+		return this;
 	}
+	
+	public void showDetails() {
+		System.out.println(type);
+		for (G g : genes) {
+			System.out.println(g.toString());
+		}
+	}
+	
+	public abstract T clone();
 	
 //	@Override
 //	public void newInstance() {

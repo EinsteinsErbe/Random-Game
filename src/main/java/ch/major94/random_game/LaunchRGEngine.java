@@ -8,29 +8,37 @@ import java.util.Random;
 public class LaunchRGEngine {
 
     private static final int POP_SIZE = 10;
-    private static final int N_GENERATIONS = 100;
+    private static final int N_GENERATIONS = 10;
     private static final double uniformRate = 0.5;
-    private static final double mutationRate = 0.015;
-    private static final int tournamentSize = 5;
+    private static final double mutationRate = 0.1;
+    private static final int tournamentSize = 2;
     private static final boolean elitism = true;
+    
+    private static Genotype[] pop;
 
     public static void main(String[] args) {
 
         //ArrayList<Genotype> population = new ArrayList<Genotype>(100);
-        Genotype[] pop = new Genotype[POP_SIZE];
+        pop = new Genotype[POP_SIZE];
         Arrays.parallelSetAll(pop, g -> new Genotype());
+        
+        //printPop();
 
-        for (int i = 0; i < N_GENERATIONS; i++) {
-            System.out.print("GENERATION " + (i + 1));
+        for (int i = 0; i <= N_GENERATIONS; i++) {
+        	if(i>0) {
+        		pop = evolve(pop);
+        	}
+            
             Arrays.stream(pop).forEachOrdered(g -> g.calcFitness(0));
-            System.out.println(": Fitness:");
-            pop = evolve(pop);
+            Arrays.parallelSort(pop);
+            //pop[POP_SIZE-1].showDetails();
+            System.out.println("GENERATION "+(i)+": best fitness: "+pop[POP_SIZE-1].getFitness());
         }
 
-        //Arrays.stream(pop).parallel().forEach(g -> g = new Genotype());
-        Arrays.stream(pop).forEach(g -> g.calcFitness(0));
         Arrays.parallelSort(pop);
-        Arrays.stream(pop).forEachOrdered(g -> System.out.println(g.getFitness()));
+        //Arrays.stream(pop).forEachOrdered(g -> System.out.println(g.getFitness()));
+        pop[POP_SIZE-1].showDetails();
+        //printPop();
     }
 
     private static Genotype[] evolve(Genotype[] pop) {
@@ -53,11 +61,13 @@ public class LaunchRGEngine {
 
         // Loop over the population size and create new individuals with
         // crossover
-        //TODO parallelSetAll
+        //TODO parallelSetAll?
         Arrays.setAll(newPop, g -> tournamentSelection(pop).crossover(tournamentSelection(pop)));
 
         // Mutate population
-        Arrays.stream(newPop).parallel().forEach(g -> g.mutate());
+        Arrays.stream(newPop).parallel().forEach(g -> {
+        	if(Math.random()<mutationRate) g.mutate();
+        	});
 
         return newPop;
     }
@@ -73,5 +83,11 @@ public class LaunchRGEngine {
         // Get the fittest
         Arrays.parallelSort(tournament);
         return tournament[tournamentSize - 1];
+    }
+    
+    public static void printPop() {
+    	for (Genotype g : pop) {
+			g.showDetails();
+		}
     }
 }

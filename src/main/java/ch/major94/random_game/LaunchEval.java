@@ -5,7 +5,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import core.game.Game;
 import core.game.StateObservation;
 import core.vgdl.VGDLFactory;
@@ -17,9 +20,19 @@ import tracks.singlePlayer.advanced.olets.SingleMCTSPlayer;
 
 public class LaunchEval {
 
-	static int AGENT_TIME = 10;
-	static int N_AGENTS = 100;
+	static int AGENT_TIME = 40;
+	static int N_AGENTS = 8;
 	static StringBuffer sb = new StringBuffer();
+	
+	static String sampleRandomController = "tracks.singlePlayer.simple.sampleRandom.Agent";
+	static String doNothingController = "tracks.singlePlayer.simple.doNothing.Agent";
+	static String sampleOneStepController = "tracks.singlePlayer.simple.sampleonesteplookahead.Agent";
+	static String sampleFlatMCTSController = "tracks.singlePlayer.simple.greedyTreeSearch.Agent";
+
+	static String sampleMCTSController = "tracks.singlePlayer.advanced.sampleMCTS.Agent";
+	static String sampleRSController = "tracks.singlePlayer.advanced.sampleRS.Agent";
+	static String sampleRHEAController = "tracks.singlePlayer.advanced.sampleRHEA.Agent";
+	static String sampleOLETSController = "tracks.singlePlayer.advanced.olets.Agent";
 
 	public static void main(String[] args) {
 
@@ -28,7 +41,7 @@ public class LaunchEval {
 
 		println("A_TIME: \tMIN_ITER: \tFRAMES   \tPOINTS   \tWIN_RATE \tWIN_FRAMES \tTIME");
 
-		for(int i=40; i<=200; i+=5) {
+		for(int i=0; i<=100; i+=1) {
 			//for(int j=1; j<=10; j+=5) {
 			for(int k=0; k<5; k++) {
 				eval(game, level, i, 1);
@@ -42,10 +55,10 @@ public class LaunchEval {
 		AGENT_TIME = a_time;
 		SingleMCTSPlayer.MIN_ITER = min_iter;
 		print(a_time+"\t\t"+min_iter+"\t\t");
-		eval(game, level);
+		double score = eval(game, level);
 		long end = System.nanoTime();
 		double delta = (end-start)/1000000000.0;
-		println(delta+"");
+		println(delta+"\t SCORE: "+score);
 	}
 
 	public static double eval(String[] game, String[] level) {
@@ -72,7 +85,7 @@ public class LaunchEval {
 		//alle in ein Array oder Liste (ohne parallelSetAll)
 		//		final int parallelism = 8;
 
-		double pos = evalAgent(SharedData.BEST_AGENT_NAME, N_AGENTS, 1.0, seed, state);
+		double pos = evalAgent(sampleOLETSController, N_AGENTS, 1.0, seed, state);
 		double neg = 0;//evalAgent(SharedData.RANDOM_AGENT_NAME, 10*N_AGENTS, -2.0, seed, state);
 
 		//System.out.println("Positve result: "+pos);
@@ -84,23 +97,49 @@ public class LaunchEval {
 	private static double evalAgent(String agentName, int n_agents, double weight, int seed, StateObservation state) {
 
 		GameEval[] result = new GameEval[n_agents];
+		
+		AtomicBoolean winnerFound = new AtomicBoolean(false);
 
-		Arrays.parallelSetAll(result, (i)->new GameEval(i));
+		Arrays.parallelSetAll(result, (i)->new GameEval(i, winnerFound));
 
+//		Arrays.stream(result).parallel().forEach((GameEval ge) -> {
+//			ge.setState(state);
+//			ge.simulate(2000, agentName, AGENT_TIME, new Random().nextInt(), false);
+//		});
+//		
+//		int frames = Arrays.stream(result).parallel().mapToInt(GameEval::getSteps).sum()/n_agents;
+//		double score = Arrays.stream(result).parallel().mapToDouble(GameEval::getScore).sum()/n_agents;	
+//		int winner = Arrays.stream(result).parallel().mapToInt(GameEval::getWin).sum();
+//		double win_rate = winner/(double)n_agents;
+//		int win_frames = winner>0 ? Arrays.stream(result).parallel().filter(ge -> ge.isWin()).mapToInt(GameEval::getSteps).sum()/winner : 0;
+//
+//		print(frames+"\t\t"+score+"\t\t"+win_rate+"\t\t"+win_frames+"\t\t");
+//
+//		return Arrays.stream(result).parallel().mapToDouble(GameEval::getScore).sum()/n_agents*weight;
+		
+//****************Kind of Best first search*********************	
+		
 		Arrays.stream(result).parallel().forEach((GameEval ge) -> {
 			ge.setState(state);
-			ge.simulate(2000, agentName, AGENT_TIME, new Random().nextInt(), false);
+			if(ge.simulate(2000, agentName, AGENT_TIME, new Random().nextInt(), false)) {
+				winnerFound.set(true);
+			}
 		});
-
-		int frames = Arrays.stream(result).parallel().mapToInt(GameEval::getSteps).sum()/n_agents;
-		double score = Arrays.stream(result).parallel().mapToDouble(GameEval::getScore).sum()/n_agents;	
-		int winner = Arrays.stream(result).parallel().mapToInt(GameEval::getWin).sum();
-		double win_rate = winner/(double)n_agents;
-		int win_frames = winner>0 ? Arrays.stream(result).parallel().filter(ge -> ge.isWin()).mapToInt(GameEval::getSteps).sum()/winner : 0;
-
-		print(frames+"\t\t"+score+"\t\t"+win_rate+"\t\t"+win_frames+"\t\t");
-
-		return Arrays.stream(result).parallel().mapToDouble(GameEval::getScore).sum()/n_agents*weight;
+		
+		Optional<GameEval> first = Arrays.stream(result).parallel().filter(ge -> ge.isWin()).findFirst();
+	
+//************************************
+//		Arrays.stream(result).parallel().forEach((GameEval ge) -> ge.setState(state));
+//		
+//		Optional<GameEval> first = Arrays.stream(result).parallel().filter(ge -> ge.simulate(2000, agentName, AGENT_TIME, new Random().nextInt(), false)).findFirst();
+//
+		if(first.isPresent()) {
+			print(first.get().getSteps()+"\t\t"+first.get().getScore()+"\t\t"+first.get().getWin()+"\t\t"+first.get().getSteps()+"\t\t");
+			return first.get().getScore();
+		}
+		else {
+			return Arrays.stream(result).parallel().mapToDouble(GameEval::getScore).max().orElse(0);
+		}
 	}
 
 	private static void println(String s) {
