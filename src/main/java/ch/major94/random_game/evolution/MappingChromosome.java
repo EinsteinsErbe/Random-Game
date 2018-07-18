@@ -1,6 +1,6 @@
 package ch.major94.random_game.evolution;
 
-public class MappingChromosome extends Chromosome<MappingChromosome, String> {
+public class MappingChromosome extends Chromosome<String> {
 	
 	public MappingChromosome() {
 		super();
@@ -16,11 +16,14 @@ public class MappingChromosome extends Chromosome<MappingChromosome, String> {
 
 	@Override
 	public void newInstance() {
+		genes.clear();
 		// TODO Auto-generated method stub
-		genes.add("10");
-		genes.add("6");
-		genes.add("3");
-		genes.add("1");
+		genes.add(newGene());
+		genes.add(newGene());
+		genes.add(newGene());
+		genes.add(newGene());
+		genes.add(newGene());
+		genes.add(newGene());
 	}
 
 	@Override
@@ -30,5 +33,10 @@ public class MappingChromosome extends Chromosome<MappingChromosome, String> {
 			c.getGenes().add(getGene(i));
 		}
 		return c;
+	}
+
+	@Override
+	protected String newGene() {					//#################################TODO evtl fixed list (array of 10) for each mapping entry
+		return getRandomField() + " > " + getRandomSprite() + " " + optional(getRandomSprite(), 0.3, "");
 	}
 }

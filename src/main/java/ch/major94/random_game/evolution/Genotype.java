@@ -1,6 +1,10 @@
 package ch.major94.random_game.evolution;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+
+import ch.major94.random_game.LaunchEval;
+import io.jenetics.internal.collection.Array;
 
 public class Genotype extends RandomElement implements Evolvable<Genotype>, Comparable<Genotype>{
 
@@ -14,7 +18,7 @@ public class Genotype extends RandomElement implements Evolvable<Genotype>, Comp
 
 	private double fitness;
 
-	private Chromosome<?,?>[] chromosomes;
+	private Chromosome<?>[] chromosomes;
 
 	public Genotype() {
 		super();
@@ -66,7 +70,7 @@ public class Genotype extends RandomElement implements Evolvable<Genotype>, Comp
 			System.out.println("INZEST");
 			return this;
 		}
-		*/
+		 */
 		Genotype g = new Genotype(this);
 
 		int i = random.nextInt(NUM_CHROMOSOMES);
@@ -87,17 +91,31 @@ public class Genotype extends RandomElement implements Evolvable<Genotype>, Comp
 		Arrays.stream(chromosomes).forEach(c -> c.newInstance());
 	}
 
+	public String[] buildGame() {
+		ArrayList<String> game = new ArrayList<>();
+		game.add("BasicGame");
+		game.addAll(sprites.build());
+		game.addAll(mapping.build());
+		game.addAll(interactions.build());
+		game.addAll(terminations.build());
+		return game.toArray(new String[0]);
+	}
+
+	public String[] buildLevel() {
+		return level.buildLevel();
+	}
+
 	public void calcFitness(long seed) {
-		//TODO
-		//spiel parsen
-		//eval funktion mit mcts (parallel)
-		fitness = 0;
-		for (String s : mapping.genes) {
-			fitness += Integer.parseInt(s);
+		try {
+			fitness = LaunchEval.eval(buildGame(), buildLevel());
+		} catch (Exception e) {
+			System.out.println("INVALID");
+			//e.printStackTrace();
+			fitness = -1;
 		}
 	}
 
-	public Chromosome<?, ?> getChromosome(int i){
+	public Chromosome<?> getChromosome(int i){
 		return chromosomes[i];
 	}
 
@@ -138,7 +156,7 @@ public class Genotype extends RandomElement implements Evolvable<Genotype>, Comp
 		System.out.println("======================================================");
 		System.out.println(this);
 		System.out.println("Fitness: "+fitness);
-		for (Chromosome<?, ?> c : chromosomes) {
+		for (Chromosome<?> c : chromosomes) {
 			System.out.println();
 			c.showDetails();
 		}

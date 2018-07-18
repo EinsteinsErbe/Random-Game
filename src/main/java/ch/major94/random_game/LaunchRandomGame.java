@@ -12,11 +12,12 @@ public class LaunchRandomGame {
 		CompetitionParameters.GAMETICKS = 0;
 
 		//Use custom Game
-		final String game = "game.txt";
-		final String level1 = "level.txt";
+		final String game = "game1.txt";
+		final String level1 = "level1.txt";
 		final String readActionsFile = "actions0.txt";
 
 //		ArcadeMachine.runOneGame(game, level1, visuals, SharedData.NAIVE_AGENT_NAME, recordActionsFile, seed, 0);
-		ArcadeMachine.replayGame(game, level1, visuals, readActionsFile);
+		//ArcadeMachine.replayGame(game, level1, visuals, readActionsFile);
+		ArcadeMachine.playOneGame(game, level1, null, 0);
 	}
 }

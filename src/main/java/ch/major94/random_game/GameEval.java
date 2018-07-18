@@ -44,7 +44,7 @@ public class GameEval {
 			return win;
 			//System.out.println("Agent "+id+": "+res+" frames | "+state.getGameScore()+" points, "+state.getGameWinner()+" => "+score);
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return false;
 	}

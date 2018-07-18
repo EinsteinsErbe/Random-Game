@@ -20,7 +20,7 @@ import tracks.singlePlayer.advanced.olets.SingleMCTSPlayer;
 
 public class LaunchEval {
 
-	static int AGENT_TIME = 40;
+	static int AGENT_TIME = 10;
 	static int N_AGENTS = 8;
 	static StringBuffer sb = new StringBuffer();
 	
@@ -77,24 +77,25 @@ public class LaunchEval {
 
 		//********************************
 		//entweder fitness function parallel aufrufen (evtl. problem wenn mehrere spiele gleichzeitig erstellt werden)
-		//oder fitness funtion gut parallelisieren
+		//oder fitness funktion gut parallelisieren
 
 		//auf welcher ebene daten austauschen? als string[] ist am einfachsten, als listen mit jeweiligem content schneller
 
 		//Liste mit Agents, Anzahl und gewichte definieren
 		//alle in ein Array oder Liste (ohne parallelSetAll)
 		//		final int parallelism = 8;
+		System.out.print("A ");
+		double pos = evalBestAgent(sampleOLETSController, N_AGENTS, 1.0, seed, state, 500);
+		System.out.print("B ");
+		double neg = evalAvrgAgent(SharedData.RANDOM_AGENT_NAME, 10*N_AGENTS, -0.99, seed, state, 2000);
 
-		double pos = evalAgent(sampleOLETSController, N_AGENTS, 1.0, seed, state);
-		double neg = 0;//evalAgent(SharedData.RANDOM_AGENT_NAME, 10*N_AGENTS, -2.0, seed, state);
-
-		//System.out.println("Positve result: "+pos);
-		//System.out.println("Negative result: "+-neg);
+		System.out.print(" Positve result: "+pos);
+		System.out.println("\t Negative result: "+-neg);
 
 		return pos + neg;
 	}
 
-	private static double evalAgent(String agentName, int n_agents, double weight, int seed, StateObservation state) {
+	private static double evalBestAgent(String agentName, int n_agents, double weight, int seed, StateObservation state, int max) {
 
 		GameEval[] result = new GameEval[n_agents];
 		
@@ -121,7 +122,7 @@ public class LaunchEval {
 		
 		Arrays.stream(result).parallel().forEach((GameEval ge) -> {
 			ge.setState(state);
-			if(ge.simulate(2000, agentName, AGENT_TIME, new Random().nextInt(), false)) {
+			if(ge.simulate(max, agentName, AGENT_TIME, new Random().nextInt(), false)) {
 				winnerFound.set(true);
 			}
 		});
@@ -135,11 +136,29 @@ public class LaunchEval {
 //
 		if(first.isPresent()) {
 			print(first.get().getSteps()+"\t\t"+first.get().getScore()+"\t\t"+first.get().getWin()+"\t\t"+first.get().getSteps()+"\t\t");
-			return first.get().getScore();
+			return first.get().getScore()*weight;
 		}
 		else {
-			return Arrays.stream(result).parallel().mapToDouble(GameEval::getScore).max().orElse(0);
+			return Arrays.stream(result).parallel().mapToDouble(GameEval::getScore).max().orElse(0)*weight;
 		}
+	}
+	
+	private static double evalAvrgAgent(String agentName, int n_agents, double weight, int seed, StateObservation state, int max) {
+
+		GameEval[] result = new GameEval[n_agents];
+		
+		AtomicBoolean winnerFound = new AtomicBoolean(false);
+
+		Arrays.parallelSetAll(result, (i)->new GameEval(i, winnerFound));
+
+		Arrays.stream(result).parallel().forEach((GameEval ge) -> {
+			ge.setState(state);
+			ge.simulate(max, agentName, AGENT_TIME, new Random().nextInt(), false);
+			System.out.print("X");
+		});
+
+		return Arrays.stream(result).parallel().mapToDouble(GameEval::getScore).sum()/n_agents*weight;
+		
 	}
 
 	private static void println(String s) {
@@ -156,6 +175,6 @@ public class LaunchEval {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.print(s);
+		//System.out.print(s);
 	}
 }
