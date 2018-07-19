@@ -84,10 +84,10 @@ public class LaunchEval {
 		//Liste mit Agents, Anzahl und gewichte definieren
 		//alle in ein Array oder Liste (ohne parallelSetAll)
 		//		final int parallelism = 8;
-		System.out.print("A ");
+		System.out.print("A1: ");
 		double pos = evalBestAgent(sampleOLETSController, N_AGENTS, 1.0, seed, state, 500);
-		System.out.print("B ");
-		double neg = evalAvrgAgent(SharedData.RANDOM_AGENT_NAME, 10*N_AGENTS, -0.99, seed, state, 2000);
+		System.out.print("\tA2: ");
+		double neg = evalAvrgAgent(SharedData.RANDOM_AGENT_NAME, 10*N_AGENTS, -0.999, seed, state, 2000);
 
 		System.out.print(" Positve result: "+pos);
 		System.out.println("\t Negative result: "+-neg);
@@ -125,6 +125,7 @@ public class LaunchEval {
 			if(ge.simulate(max, agentName, AGENT_TIME, new Random().nextInt(), false)) {
 				winnerFound.set(true);
 			}
+			System.out.print("*");
 		});
 		
 		Optional<GameEval> first = Arrays.stream(result).parallel().filter(ge -> ge.isWin()).findFirst();
@@ -154,7 +155,7 @@ public class LaunchEval {
 		Arrays.stream(result).parallel().forEach((GameEval ge) -> {
 			ge.setState(state);
 			ge.simulate(max, agentName, AGENT_TIME, new Random().nextInt(), false);
-			System.out.print("X");
+			System.out.print("*");
 		});
 
 		return Arrays.stream(result).parallel().mapToDouble(GameEval::getScore).sum()/n_agents*weight;

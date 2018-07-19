@@ -8,11 +8,11 @@ public class MappingChromosome extends Chromosome<String> {
 		type = ChromosomeType.MAPPING;
 	}
 
-	@Override
-	public void mutate() {
-		// TODO Auto-generated method stub
-		
-	}
+//	@Override
+//	public void mutate() {
+//		// TODO Auto-generated method stub
+//		
+//	}
 
 	@Override
 	public void newInstance() {

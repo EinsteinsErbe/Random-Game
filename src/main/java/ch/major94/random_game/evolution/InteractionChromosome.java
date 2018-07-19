@@ -21,11 +21,11 @@ public class InteractionChromosome extends Chromosome<String> {
 		type = ChromosomeType.INTERACTION;
 	}
 
-	@Override
-	public void mutate() {
-		// TODO Auto-generated method stub
-
-	}
+//	@Override
+//	public void mutate() {
+//		// TODO Auto-generated method stub
+//
+//	}
 
 	@Override
 	public void newInstance() {
@@ -49,7 +49,7 @@ public class InteractionChromosome extends Chromosome<String> {
 	@Override
 	protected String newGene() {
 		String effect = pickRandom(effects).replace("$SPRITE", getRandomSprite());
-		String sprite = getRandomSprite() + " " + getRandomSprite() + " > " + effect + optional(" scoreChange=1", 0.2, "");
+		String sprite = getRandomSprite() + " " + getRandomSprite() + " > " + effect + optional(" scoreChange=1", 0.1, "");
 		return sprite;
 	}
 }

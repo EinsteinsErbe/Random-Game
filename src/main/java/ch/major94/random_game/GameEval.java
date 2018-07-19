@@ -12,7 +12,7 @@ import tracks.ruleGeneration.geneticRuleGenerator.SharedData;
 
 public class GameEval {
 	
-	final static double WIN_BONUS = 100.0;
+	final static double WIN_BONUS = 1000.0;
 
 	private StateObservation state;
 	private double score;

@@ -31,11 +31,11 @@ public class SpriteChromosome extends Chromosome<String>{
 		type = ChromosomeType.SPRITE;
 	}
 
-	@Override
-	public void mutate() {
-		// TODO Auto-generated method stub
-
-	}
+//	@Override
+//	public void mutate() {
+//		// TODO Auto-generated method stub
+//
+//	}
 
 	@Override
 	public void newInstance() {
