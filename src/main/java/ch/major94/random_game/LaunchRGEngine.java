@@ -40,12 +40,15 @@ public class LaunchRGEngine {
 		//printPop();
 
 		for (int i = 0; i <= N_GENERATIONS; i++) {
+			
+			System.out.println("######################################################");
+			System.out.println("evaluating GENERATION "+i);
+			
 			if(i>0) {
 				pop = evolve(pop);
 			}
 
 			Arrays.stream(pop).forEachOrdered(g -> g.calcFitness(0));
-			System.out.println("calulated");
 			Arrays.parallelSort(pop);
 			best = pop[POP_SIZE-1];
 			best.showDetails();

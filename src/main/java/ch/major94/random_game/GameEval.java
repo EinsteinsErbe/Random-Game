@@ -12,7 +12,7 @@ import tracks.ruleGeneration.geneticRuleGenerator.SharedData;
 
 public class GameEval {
 	
-	final static double WIN_BONUS = 1000.0;
+	//final static double WIN_BONUS = 1000.0;
 
 	private StateObservation state;
 	private double score;
@@ -39,7 +39,7 @@ public class GameEval {
 				a.teardown(state);
 			}
 			win = state.getGameWinner().equals(Types.WINNER.PLAYER_WINS);
-			score = state.getGameScore() + (win ? WIN_BONUS : 0);
+			score = state.getGameScore();// + (win ? WIN_BONUS : 0);
 			steps = res;
 			return win;
 			//System.out.println("Agent "+id+": "+res+" frames | "+state.getGameScore()+" points, "+state.getGameWinner()+" => "+score);

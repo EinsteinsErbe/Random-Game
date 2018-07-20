@@ -10,10 +10,12 @@ public class LaunchRandomGame {
 		final boolean visuals = true;
 		
 		CompetitionParameters.GAMETICKS = 0;
+		
+		final int gen = 10;
 
 		//Use custom Game
-		final String game = "game1.txt";
-		final String level1 = "level1.txt";
+		final String game = "generated/"+gen+"game1.txt";
+		final String level1 = "generated/"+gen+"level1.txt";
 		final String readActionsFile = "actions0.txt";
 
 //		ArcadeMachine.runOneGame(game, level1, visuals, SharedData.NAIVE_AGENT_NAME, recordActionsFile, seed, 0);
