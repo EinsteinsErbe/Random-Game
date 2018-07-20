@@ -1,10 +1,12 @@
 package ch.major94.random_game.evolution;
 
+import java.util.ArrayList;
+
 public class SpriteChromosome extends Chromosome<String>{
-	
+
 	private boolean hasAvatar;
 
-	private String[] sprites = {
+	private String[] nonAvatars = {
 			"Conveyor", "Flicker", "Immovable", "OrientedFlicker", "Passive", /*"Resource",*/ "Spreader",
 			/*"ErraticMissile",*/ "Missile", "RandomMissile", "Walker", "WalkerJumper",
 			/*"ResourcePack",*/ "Chaser", "PathChaser", "Fleeing", "RandomInertial",
@@ -31,23 +33,33 @@ public class SpriteChromosome extends Chromosome<String>{
 		type = ChromosomeType.SPRITE;
 	}
 
-//	@Override
-//	public void mutate() {
-//		// TODO Auto-generated method stub
-//
-//	}
+	@Override
+	public void mutate() {
+		// TODO Auto-generated method stub
+		replaceRandomGene(newGene());
+		int i = getRandonGeneI();
+		if(i == 0) {
+			hasAvatar = false;
+		}
+		replaceGene(newGene(), i);
+	}
+
+	@Override
+	public Chromosome<String> crossover(Chromosome<String> chromosome) {
+		int i = getRandonGeneI();
+		replaceGene(chromosome.getGene(i), i);
+		return this;
+	}
 
 	@Override
 	public void newInstance() {
 		genes.clear();
 		hasAvatar = false;
 		// TODO Auto-generated method stub
-		genes.add(newGene());
-		genes.add(newGene());
-		genes.add(newGene());
-		genes.add(newGene());
-		genes.add(newGene());
-		genes.add(newGene());
+		for(int i=0; i<N_SPRITES; i++) {
+			genes.add(newGene());
+		}
+
 	}
 
 	@Override
@@ -60,12 +72,23 @@ public class SpriteChromosome extends Chromosome<String>{
 	}
 
 	@Override
+	public ArrayList<String> build() {
+		ArrayList<String> s = new ArrayList<String>();
+		s.add("  "+type.getName());
+		for(int i=0; i<N_SPRITES; i++) {
+			s.add("    "+SPRITE+i+genes.get(i));
+		}
+		s.add("");
+		return s;
+	}
+
+	@Override
 	protected String newGene() {
-		String[] pick = hasAvatar ? sprites : avatars;
-		
+		String[] pick = hasAvatar ? nonAvatars : avatars;
+
 		hasAvatar = true;
-		
-		return getRandomSprite() + " > " + pickRandom(pick) + " stype=" + getRandomSprite() + " color=" + pickRandom(colors) +
+
+		return " > " + pickRandom(pick) + " stype=" + getRandomSprite() + " color=" + pickRandom(colors) +
 				" cooldown=" + random.nextInt(30) + " cons=" + random.nextInt(10) + " prob=0.01" +
 				" speed=0.8" + optional(" singleton=True", 0.1, "");
 	}

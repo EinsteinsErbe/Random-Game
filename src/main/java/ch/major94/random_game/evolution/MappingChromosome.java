@@ -1,5 +1,7 @@
 package ch.major94.random_game.evolution;
 
+import java.util.ArrayList;
+
 public class MappingChromosome extends Chromosome<String> {
 	
 	public MappingChromosome() {
@@ -18,12 +20,9 @@ public class MappingChromosome extends Chromosome<String> {
 	public void newInstance() {
 		genes.clear();
 		// TODO Auto-generated method stub
-		genes.add(newGene());
-		genes.add(newGene());
-		genes.add(newGene());
-		genes.add(newGene());
-		genes.add(newGene());
-		genes.add(newGene());
+		for(int i=0; i<N_FIELDS; i++) {
+			genes.add(newGene());
+		}
 	}
 
 	@Override
@@ -34,9 +33,20 @@ public class MappingChromosome extends Chromosome<String> {
 		}
 		return c;
 	}
+	
+	@Override
+	public ArrayList<String> build() {
+		ArrayList<String> s = new ArrayList<String>();
+		s.add("  "+type.getName());
+		for(int i=0; i<N_SPRITES; i++) {
+			s.add("    "+i+genes.get(i));
+		}
+		s.add("");
+		return s;
+	}
 
 	@Override
-	protected String newGene() {					//#################################TODO evtl fixed list (array of 10) for each mapping entry
-		return getRandomField() + " > " + getRandomSprite() + " " + optional(getRandomSprite(), 0.3, "");
+	protected String newGene() {
+		return " > " + getRandomSprite() + " " + optional(getRandomSprite(), 0.3, "");
 	}
 }

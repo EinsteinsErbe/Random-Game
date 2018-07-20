@@ -156,9 +156,11 @@ public class Genotype extends RandomElement implements Evolvable<Genotype>, Comp
 		System.out.println("======================================================");
 		System.out.println(this);
 		System.out.println("Fitness: "+fitness);
-		for (Chromosome<?> c : chromosomes) {
-			System.out.println();
-			c.showDetails();
+		for(String s : buildGame()) {
+			System.out.println(s);
+		}
+		for(String s : buildLevel()) {
+			System.out.println(s);
 		}
 		System.out.println("======================================================");
 	}

@@ -38,7 +38,10 @@ public class LevelChromosome extends Chromosome<String> {
 
 	public String[] buildLevel() {
 		String[] level = new String[SIZE];
-		Arrays.parallelSetAll(level, g -> getRandomGene()); 		//TODO nicht zufällig verteilen?
+		for(int i=0; i<SIZE; i++) {
+			level[i] = getGene(i);
+		}
+		//Arrays.parallelSetAll(level, g -> getRandomGene()); 		//TODO nicht zufällig verteilen?
 		return level;
 	}
 
