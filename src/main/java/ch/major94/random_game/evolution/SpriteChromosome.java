@@ -76,7 +76,7 @@ public class SpriteChromosome extends Chromosome<String>{
 		ArrayList<String> s = new ArrayList<String>();
 		s.add("  "+type.getName());
 		for(int i=0; i<N_SPRITES; i++) {
-			s.add("    "+SPRITE+i+genes.get(i));
+			s.add("    "+SPRITE+i+genes.get(i)+(i+1));
 		}
 		s.add("");
 		return s;
@@ -90,6 +90,6 @@ public class SpriteChromosome extends Chromosome<String>{
 
 		return " > " + pickRandom(pick) + " stype=" + getRandomSprite() + " color=" + pickRandom(colors) +
 				" cooldown=" + random.nextInt(30) + " cons=" + random.nextInt(10) + " prob=0.01" +
-				" speed=0.8" + optional(" singleton=True", 0.1, "");
+				" speed=0.8" + " frameRate=8" + optional(" singleton=True", 0.1, "") + " randomtiling=0.9" + " img=debug/";
 	}
 }
