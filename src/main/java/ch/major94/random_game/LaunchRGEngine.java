@@ -1,5 +1,6 @@
 package ch.major94.random_game;
 
+import ch.major94.random_game.display.LineChart;
 import ch.major94.random_game.evolution.Chromosome;
 import ch.major94.random_game.evolution.Genotype;
 import core.logging.Logger;
@@ -24,13 +25,19 @@ public class LaunchRGEngine {
 
 	public static void main(String[] args) {
 
+		LineChart chart = new LineChart(
+				"Random Game Evolution" ,
+				"Verlauf der Fitness",
+				"Generation",
+				"Best Fitness");
+
+		chart.pack( );
+		chart.setVisible( true );
+
 		Chromosome.setupLists();
 		Logger.getInstance().active = false; //Disable parse errors
 
 		Genotype best = new Genotype();
-		//geno.showDetails();
-		//System.exit(0);
-
 
 		//ArrayList<Genotype> population = new ArrayList<Genotype>(100);
 		pop = new Genotype[POP_SIZE];
@@ -40,10 +47,10 @@ public class LaunchRGEngine {
 		//printPop();
 
 		for (int i = 0; i <= N_GENERATIONS; i++) {
-			
+
 			System.out.println("######################################################");
 			System.out.println("evaluating GENERATION "+i);
-			
+
 			if(i>0) {
 				pop = evolve(pop);
 			}
@@ -55,6 +62,7 @@ public class LaunchRGEngine {
 			//TODO write game files?
 			writeFiles(best, i);
 			System.out.println("GENERATION "+(i)+": best fitness: "+best.getFitness());
+			chart.addData(i, best.getFitness());
 		}
 	}
 
@@ -78,7 +86,7 @@ public class LaunchRGEngine {
 		Arrays.stream(newPop).parallel().forEach(g -> {
 			if(Math.random()<mutationRate) g.mutate();
 		});
-		
+
 		if (elitism) {
 			newPop[0] = best;
 		}
