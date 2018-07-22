@@ -15,7 +15,7 @@ import java.util.Random;
 public class LaunchRGEngine {
 
 	private static final int POP_SIZE = 20;
-	private static final int N_GENERATIONS = 10;
+	private static final int N_GENERATIONS = 20;
 	private static final double uniformRate = 0.5;
 	private static final double mutationRate = 0.2;
 	private static final int tournamentSize = 2;

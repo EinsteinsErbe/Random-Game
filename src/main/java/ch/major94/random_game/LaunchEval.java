@@ -5,10 +5,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Optional;
-import java.util.OptionalDouble;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Stream;
 
 import core.game.Game;
 import core.game.StateObservation;
@@ -21,7 +20,7 @@ import tracks.singlePlayer.advanced.olets.SingleMCTSPlayer;
 
 public class LaunchEval {
 
-	static int AGENT_TIME = 15;
+	static int AGENT_TIME = 20;
 	static int N_AGENTS = 8;
 	static StringBuffer sb = new StringBuffer();
 	
@@ -88,25 +87,37 @@ public class LaunchEval {
 		System.out.print("Good Player: ");
 		GameEval[] result1 = evalBestAgent(sampleOLETSController, N_AGENTS, seed, state, 500);
 		double max = Arrays.stream(result1).parallel().mapToDouble(GameEval::getScore).max().orElse(0);
-		double win = Arrays.stream(result1).parallel().filter(ge -> ge.isWin()).count() >= 1 ? 1 : 0;
+		double win = Arrays.stream(result1).parallel().anyMatch(ge -> ge.isWin()) ? 1 : 0;
 		int frames = Arrays.stream(result1).parallel().mapToInt(GameEval::getSteps).min().orElse(0);
 		System.out.print(" Result: "+max+"\t"+win);
 		
 		System.out.print("\tBad Player: ");
-		GameEval[] result2 = evalAvrgAgent(SharedData.RANDOM_AGENT_NAME, 5*N_AGENTS, seed, state, 500);
+		GameEval[] result2 = evalAvrgAgent(SharedData.RANDOM_AGENT_NAME, N_AGENTS, seed, state, 500);
 		double avrg = Arrays.stream(result2).parallel().mapToDouble(GameEval::getScore).average().orElse(0);
-		double avrgWin = Arrays.stream(result2).parallel().filter(ge -> ge.isWin()).count()/result2.length;
+		double avrgWin = Arrays.stream(result2).parallel().filter(ge -> ge.isWin()).count()/N_AGENTS;
 		System.out.print(" Result: "+avrg+"   \t"+avrgWin);
 		
-		//TODO add do-nothing-controller
+		System.out.print("\tIdle Player: ");
+		GameEval[] result3 = evalAvrgAgent(SharedData.DO_NOTHING_AGENT_NAME, N_AGENTS, seed, state, 500);
+		double avrg2 = Arrays.stream(result3).parallel().mapToDouble(GameEval::getScore).average().orElse(0);
+		double avrgWin2 = Arrays.stream(result3).parallel().filter(ge -> ge.isWin()).count()/N_AGENTS;
+		System.out.print(" Result: "+avrg2+"   \t"+avrgWin2);
+		
+		if(Stream.of(result1, result2, result3).anyMatch(r -> Arrays.stream(r).parallel().anyMatch(ge -> ge.isTimeOut()))) {
+			System.out.println("\t TIMEOUT");
+			return 0;
+		}
+		
+		avrg = Math.max(avrg, avrg2);
+		avrgWin = Math.max(avrgWin, avrgWin2);
 		
 		double fitness = 0;
 		
 		//Anyone has won
-		fitness += win+avrgWin>0 ? 1 : 0;
+		//fitness += win+avrgWin>0 ? 1 : 0;
 		
 		//better player wins
-		fitness += win-avrgWin;
+		fitness += win-avrgWin>0 ? win-avrgWin+1 : 0;
 		
 		//Bonus for getting more points than the random agents
 		if(max > 0 && max>avrg) {
@@ -134,7 +145,7 @@ public class LaunchEval {
 			if(ge.simulate(max, agentName, AGENT_TIME, new Random().nextInt(), false)) {
 				winnerFound.set(true);
 			}
-			System.out.print("*");
+			System.out.print(ge.finishChar());
 		});
 		
 		return result;
@@ -160,7 +171,7 @@ public class LaunchEval {
 		Arrays.stream(result).parallel().forEach((GameEval ge) -> {
 			ge.setState(state);
 			ge.simulate(max, agentName, AGENT_TIME, new Random().nextInt(), false);
-			System.out.print("*");
+			System.out.print(ge.finishChar());
 		});
 
 		return result;

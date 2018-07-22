@@ -19,6 +19,7 @@ public class GameEval {
 	private boolean win;
 	private int steps;
 	private AtomicBoolean winnerFound;
+	private boolean timeOut = false;
 	
 	private int id;
 
@@ -62,11 +63,12 @@ public class GameEval {
 			stateObs.advance(bestAction);
 			agent.logAction(bestAction);
 			//k += checkIfOffScreen(stateObs);
+			
+			timeOut = timer.elapsedMillis() > 2*agentTime + 100;
 
-			if(stateObs.isGameOver() || winnerFound.get()){
+			if(stateObs.isGameOver() || winnerFound.get() || timeOut){
 				break;
 			}
-
 		}
 		if(k > 0) {
 			// add k to global var keeping track of this
@@ -116,5 +118,13 @@ public class GameEval {
 	
 	public int getSteps() {
 		return steps;
+	}
+	
+	public boolean isTimeOut() {
+		return timeOut;
+	}
+
+	public char finishChar() {
+		return timeOut ? 'X' : '*';
 	}
 }
