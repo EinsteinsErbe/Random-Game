@@ -13,10 +13,10 @@ import java.util.Random;
 
 public class LaunchRGEngine {
 
-	private static final int POP_SIZE = 10;
+	private static final int POP_SIZE = 20;
 	private static final int N_GENERATIONS = 10;
 	private static final double uniformRate = 0.5;
-	private static final double mutationRate = 0.1;
+	private static final double mutationRate = 0.2;
 	private static final int tournamentSize = 2;
 	private static final boolean elitism = true;
 
@@ -73,15 +73,15 @@ public class LaunchRGEngine {
 		// crossover
 		//TODO parallelSetAll?
 		Arrays.setAll(newPop, g -> tournamentSelection(pop).crossover(tournamentSelection(pop)));
-		
-		if (elitism) {
-			newPop[0] = best;
-		}
 
 		// Mutate population
 		Arrays.stream(newPop).parallel().forEach(g -> {
 			if(Math.random()<mutationRate) g.mutate();
 		});
+		
+		if (elitism) {
+			newPop[0] = best;
+		}
 
 		return newPop;
 	}

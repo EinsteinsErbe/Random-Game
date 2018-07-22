@@ -15,7 +15,7 @@ public abstract class Chromosome<G> extends RandomElement implements Evolvable<C
 	protected ArrayList<G> genes;
 
 	protected ChromosomeType type = ChromosomeType.NONE;
-	
+
 	public Chromosome(){
 		super();
 
@@ -29,7 +29,7 @@ public abstract class Chromosome<G> extends RandomElement implements Evolvable<C
 	public ArrayList<G> getGenes() {
 		return genes;
 	}
-	
+
 	public G replaceGene(G gene, int i) {
 		G gene2 = genes.remove(i);
 		genes.add(i, gene);
@@ -54,18 +54,18 @@ public abstract class Chromosome<G> extends RandomElement implements Evolvable<C
 		replaceRandomGene(chromosome.getRandomGene());
 		return this;
 	}
-	
+
 	@Override
 	public void mutate() {
 		replaceRandomGene(newGene());
 	}
 
-//	public void showDetails() {
-//		System.out.println(type);
-//		for (G g : genes) {
-//			System.out.println(g.toString());
-//		}
-//	}
+	//	public void showDetails() {
+	//		System.out.println(type);
+	//		for (G g : genes) {
+	//			System.out.println(g.toString());
+	//		}
+	//	}
 
 	public ArrayList<String> build() {
 		ArrayList<String> s = new ArrayList<String>();
@@ -76,7 +76,7 @@ public abstract class Chromosome<G> extends RandomElement implements Evolvable<C
 		s.add("");
 		return s;
 	}
-	
+
 	protected abstract G newGene();
 
 	public abstract Chromosome<G> clone();
@@ -94,19 +94,19 @@ public abstract class Chromosome<G> extends RandomElement implements Evolvable<C
 			fields[i] = Character.forDigit(i, 10);
 		}
 	}
-	
+
 	protected String getRandomSprite() {
 		return sprites[random.nextInt(N_SPRITES)];
 	}
-	
+
 	protected char getRandomField() {
 		return fields[random.nextInt(N_FIELDS)];
 	}
-	
+
 	protected <T> T pickRandom(T[] array) {
 		return array[random.nextInt(array.length)];
 	}
-	
+
 	protected String optional(String s, double prob, String elseS) {
 		return random.nextDouble()<prob ? s : elseS;
 	}

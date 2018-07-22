@@ -89,20 +89,33 @@ public class LaunchEval {
 		GameEval[] result1 = evalBestAgent(sampleOLETSController, N_AGENTS, seed, state, 500);
 		double max = Arrays.stream(result1).parallel().mapToDouble(GameEval::getScore).max().orElse(0);
 		double win = Arrays.stream(result1).parallel().filter(ge -> ge.isWin()).count() >= 1 ? 1 : 0;
+		int frames = Arrays.stream(result1).parallel().mapToInt(GameEval::getSteps).min().orElse(0);
 		System.out.print(" Result: "+max+"\t"+win);
 		
 		System.out.print("\tBad Player: ");
-		GameEval[] result2 = evalAvrgAgent(SharedData.RANDOM_AGENT_NAME, 5*N_AGENTS, seed, state, 2000);
+		GameEval[] result2 = evalAvrgAgent(SharedData.RANDOM_AGENT_NAME, 5*N_AGENTS, seed, state, 500);
 		double avrg = Arrays.stream(result2).parallel().mapToDouble(GameEval::getScore).average().orElse(0);
 		double avrgWin = Arrays.stream(result2).parallel().filter(ge -> ge.isWin()).count()/result2.length;
 		System.out.print(" Result: "+avrg+"   \t"+avrgWin);
 		
-		double fitness = win-avrgWin;
+		//TODO add do-nothing-controller
+		
+		double fitness = 0;
+		
+		//Anyone has won
+		fitness += win+avrgWin>0 ? 1 : 0;
+		
+		//better player wins
+		fitness += win-avrgWin;
 		
 		//Bonus for getting more points than the random agents
-		if(max > 0) {
+		if(max > 0 && max>avrg) {
 			fitness += (max-avrg)/max;
 		}
+		
+		//not instant game over
+		fitness += frames>5 ? 1 : 0;
+		
 		System.out.println("\t fitness: "+fitness);
 
 		return fitness;

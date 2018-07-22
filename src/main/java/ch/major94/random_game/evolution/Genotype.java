@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import ch.major94.random_game.LaunchEval;
-import io.jenetics.internal.collection.Array;
 
 public class Genotype extends RandomElement implements Evolvable<Genotype>, Comparable<Genotype>{
 
 	private static final int NUM_CHROMOSOMES = 5;
+	private static final double STRONG_MUTATION_RATE = 0.1;
 
 	private SpriteChromosome sprites;
 	private InteractionChromosome interactions;
@@ -60,18 +60,24 @@ public class Genotype extends RandomElement implements Evolvable<Genotype>, Comp
 
 	@Override
 	public void mutate() {
-		chromosomes[random.nextInt(NUM_CHROMOSOMES)].mutate();
+		Chromosome<?> c = chromosomes[random.nextInt(NUM_CHROMOSOMES)];
+		if(random.nextDouble()<STRONG_MUTATION_RATE) {
+			c.newInstance();
+		}
+		else {
+			c.mutate();
+		}
 	}
 
 	@Override
 	public Genotype crossover(Genotype genotype) {
-		/* AVOID INZEST?
-		if(this.equals(genotype)) {
-			System.out.println("INZEST");
-			return this;
-		}
-		 */
 		Genotype g = new Genotype(this);
+		
+		// AVOID INZEST
+		if(this.equals(genotype)) {
+			g.mutate();
+			return g;
+		}
 
 		int i = random.nextInt(NUM_CHROMOSOMES);
 		switch(i) {
