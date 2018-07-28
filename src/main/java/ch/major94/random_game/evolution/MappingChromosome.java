@@ -8,21 +8,8 @@ public class MappingChromosome extends Chromosome<String> {
 		super();
 		
 		type = ChromosomeType.MAPPING;
-	}
-
-//	@Override
-//	public void mutate() {
-//		// TODO Auto-generated method stub
-//		
-//	}
-
-	@Override
-	public void newInstance() {
-		genes.clear();
-		// TODO Auto-generated method stub
-		for(int i=0; i<N_FIELDS; i++) {
-			genes.add(newGene());
-		}
+		STDDEV = 0;
+		MEAN = N_FIELDS;
 	}
 
 	@Override
@@ -38,7 +25,7 @@ public class MappingChromosome extends Chromosome<String> {
 	public ArrayList<String> build() {
 		ArrayList<String> s = new ArrayList<String>();
 		s.add("  "+type.getName());
-		for(int i=0; i<N_SPRITES; i++) {
+		for(int i=0; i<N_FIELDS; i++) {
 			s.add("    "+i+genes.get(i));
 		}
 		s.add("");

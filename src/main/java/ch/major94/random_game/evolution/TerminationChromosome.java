@@ -14,19 +14,8 @@ public class TerminationChromosome extends Chromosome<String> {
 		super();
 
 		type = ChromosomeType.TERMINATION;
-	}
-
-//	@Override
-//	public void mutate() {
-//		
-//	}
-
-	@Override
-	public void newInstance() {
-		genes.clear();
-		// TODO Auto-generated method stub
-		genes.add(newGene());
-		genes.add(newGene());
+		STDDEV = 1;
+		MEAN = 2;
 	}
 
 	@Override
@@ -48,7 +37,7 @@ public class TerminationChromosome extends Chromosome<String> {
 		gene = gene.replace("$BOOL", Boolean.toString(random.nextBoolean()));
 		gene = gene.replace("$NUM1", Integer.toString(random.nextInt(10)));
 		gene = gene.replace("$NUM2", Integer.toString(random.nextInt(2000)));
-		
+
 		return gene;
 	}
 }

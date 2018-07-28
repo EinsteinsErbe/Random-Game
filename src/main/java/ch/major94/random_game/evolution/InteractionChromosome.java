@@ -19,22 +19,8 @@ public class InteractionChromosome extends Chromosome<String> {
 		super();
 
 		type = ChromosomeType.INTERACTION;
-	}
-
-//	@Override
-//	public void mutate() {
-//		// TODO Auto-generated method stub
-//
-//	}
-
-	@Override
-	public void newInstance() {
-		genes.clear();
-		// TODO Auto-generated method stub
-		genes.add(newGene());
-		genes.add(newGene());
-		genes.add(newGene());
-		genes.add(newGene());
+		STDDEV = 2;
+		MEAN = 4;
 	}
 
 	@Override

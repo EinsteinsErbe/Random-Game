@@ -1,30 +1,13 @@
 package ch.major94.random_game.evolution;
 
-import java.util.Arrays;
-
 public class LevelChromosome extends Chromosome<String> {
-	
-	private final static int SIZE = 5;
-	
+
 	public LevelChromosome() {
 		super();
-		
+
 		type = ChromosomeType.LEVEL;
-	}
-
-//	@Override
-//	public void mutate() {
-//		// TODO Auto-generated method stub
-//		
-//	}
-
-	@Override
-	public void newInstance() {
-		genes.clear();
-		// TODO Auto-generated method stub
-		for(int i=0; i<SIZE; i++) {
-			genes.add(newGene());
-		}
+		STDDEV = 2;
+		MEAN = 6;
 	}
 
 	@Override
@@ -37,8 +20,8 @@ public class LevelChromosome extends Chromosome<String> {
 	}
 
 	public String[] buildLevel() {
-		String[] level = new String[SIZE];
-		for(int i=0; i<SIZE; i++) {
+		String[] level = new String[genes.size()];
+		for(int i=0; i<level.length; i++) {
 			level[i] = getGene(i);
 		}
 		//Arrays.parallelSetAll(level, g -> getRandomGene()); 		//TODO nicht zufällig verteilen?
@@ -47,8 +30,8 @@ public class LevelChromosome extends Chromosome<String> {
 
 	@Override
 	protected String newGene() {
-		char[] cs = new char[SIZE];
-		for(int i=0; i<SIZE; i++) {
+		char[] cs = new char[MEAN];
+		for(int i=0; i<cs.length; i++) {
 			cs[i] = getRandomField();
 		}
 		return new String(cs);

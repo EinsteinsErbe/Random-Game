@@ -31,11 +31,12 @@ public class SpriteChromosome extends Chromosome<String>{
 		super();
 
 		type = ChromosomeType.SPRITE;
+		STDDEV = 0;
+		MEAN = N_SPRITES;
 	}
 
 	@Override
 	public void mutate() {
-		// TODO Auto-generated method stub
 		replaceRandomGene(newGene());
 		int i = getRandonGeneI();
 		if(i == 0) {
@@ -44,22 +45,10 @@ public class SpriteChromosome extends Chromosome<String>{
 		replaceGene(newGene(), i);
 	}
 
-//	@Override
-//	public Chromosome<String> crossover(Chromosome<String> chromosome) {
-//		int i = getRandonGeneI();
-//		replaceGene(chromosome.getGene(i), i);
-//		return this;
-//	}
-
 	@Override
 	public void newInstance() {
-		genes.clear();
 		hasAvatar = false;
-		
-		for(int i=0; i<N_SPRITES; i++) {
-			genes.add(newGene());
-		}
-
+		super.newInstance();
 	}
 
 	@Override
