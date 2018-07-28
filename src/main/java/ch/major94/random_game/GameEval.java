@@ -15,17 +15,17 @@ public class GameEval {
 	//final static double WIN_BONUS = 1000.0;
 
 	private StateObservation state;
-	private double score;
-	private boolean win;
-	private int steps;
-	private AtomicBoolean winnerFound;
+	private double score = 0;;
+	private boolean win = false;
+	private int steps = 0;
+	private AtomicBoolean stop;
 	private boolean timeOut = false;
 	
 	private int id;
 
-	public GameEval(int id, AtomicBoolean winnerFound) {
+	public GameEval(int id, AtomicBoolean stop) {
 		this.id = id;
-		this.winnerFound = winnerFound;
+		this.stop = stop;
 	}
 
 	public boolean simulate(int maxFrames, String agentName, int agentTime, int seed, boolean saveActions) {
@@ -42,12 +42,16 @@ public class GameEval {
 			win = state.getGameWinner().equals(Types.WINNER.PLAYER_WINS);
 			score = state.getGameScore();// + (win ? WIN_BONUS : 0);
 			steps = res;
-			return win;
+			if(timeOut) {
+				stop.set(true);
+			}
 			//System.out.println("Agent "+id+": "+res+" frames | "+state.getGameScore()+" points, "+state.getGameWinner()+" => "+score);
 		} catch (Exception e) {
 			//e.printStackTrace();
 		}
-		return false;
+		win = false;
+		
+		return win;
 	}
 	
 	private int getAgentResult(StateObservation stateObs, int steps, int agentTime, AbstractPlayer agent){
@@ -66,7 +70,7 @@ public class GameEval {
 			
 			timeOut = timer.elapsedMillis() > 2*agentTime + 100;
 
-			if(stateObs.isGameOver() || winnerFound.get() || timeOut){
+			if(stateObs.isGameOver() || stop.get() || timeOut){
 				break;
 			}
 		}
@@ -125,6 +129,6 @@ public class GameEval {
 	}
 
 	public char finishChar() {
-		return timeOut ? 'X' : '*';
+		return timeOut ? 'T' : (win ? 'X' : '*');
 	}
 }

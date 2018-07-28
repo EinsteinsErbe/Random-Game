@@ -14,8 +14,8 @@ import java.util.Random;
 
 public class LaunchRGEngine {
 
-	private static final int POP_SIZE = 20;
-	private static final int N_GENERATIONS = 20;
+	private static int POP_SIZE = 30;
+	private static int N_GENERATIONS = 30;
 	private static final double uniformRate = 0.5;
 	private static final double mutationRate = 0.2;
 	private static final int tournamentSize = 2;
@@ -24,6 +24,13 @@ public class LaunchRGEngine {
 	private static Genotype[] pop;
 
 	public static void main(String[] args) {
+		
+		try {
+			N_GENERATIONS = Integer.parseInt(args[0]);
+			POP_SIZE = Integer.parseInt(args[1]);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 
 		LineChart chart = new LineChart(
 				"Random Game Evolution" ,

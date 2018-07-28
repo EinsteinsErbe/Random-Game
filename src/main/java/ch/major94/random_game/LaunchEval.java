@@ -41,7 +41,7 @@ public class LaunchEval {
 
 		//println("A_TIME: \tMIN_ITER: \tFRAMES   \tPOINTS   \tWIN_RATE \tWIN_FRAMES \tTIME");
 
-		for(int i=0; i<=100; i+=1) {
+		for(int i=10; i<=100; i+=5) {
 			//for(int j=1; j<=10; j+=5) {
 			for(int k=0; k<5; k++) {
 				eval(game, level, i, 1);
@@ -90,20 +90,27 @@ public class LaunchEval {
 		double win = Arrays.stream(result1).parallel().anyMatch(ge -> ge.isWin()) ? 1 : 0;
 		int frames = Arrays.stream(result1).parallel().mapToInt(GameEval::getSteps).min().orElse(0);
 		System.out.print(" Result: "+max+"\t"+win);
+		if(Arrays.stream(result1).parallel().anyMatch(ge -> ge.isTimeOut())) {
+			System.out.println("\t TIMEOUT");
+			return 0;
+		}
 		
 		System.out.print("\tBad Player: ");
 		GameEval[] result2 = evalAvrgAgent(SharedData.RANDOM_AGENT_NAME, N_AGENTS, seed, state, 500);
 		double avrg = Arrays.stream(result2).parallel().mapToDouble(GameEval::getScore).average().orElse(0);
 		double avrgWin = Arrays.stream(result2).parallel().filter(ge -> ge.isWin()).count()/N_AGENTS;
 		System.out.print(" Result: "+avrg+"   \t"+avrgWin);
+		if(Arrays.stream(result1).parallel().anyMatch(ge -> ge.isTimeOut())) {
+			System.out.println("\t TIMEOUT");
+			return 0;
+		}
 		
 		System.out.print("\tIdle Player: ");
 		GameEval[] result3 = evalAvrgAgent(SharedData.DO_NOTHING_AGENT_NAME, N_AGENTS, seed, state, 500);
 		double avrg2 = Arrays.stream(result3).parallel().mapToDouble(GameEval::getScore).average().orElse(0);
 		double avrgWin2 = Arrays.stream(result3).parallel().filter(ge -> ge.isWin()).count()/N_AGENTS;
 		System.out.print(" Result: "+avrg2+"   \t"+avrgWin2);
-		
-		if(Stream.of(result1, result2, result3).anyMatch(r -> Arrays.stream(r).parallel().anyMatch(ge -> ge.isTimeOut()))) {
+		if(Arrays.stream(result1).parallel().anyMatch(ge -> ge.isTimeOut())) {
 			System.out.println("\t TIMEOUT");
 			return 0;
 		}
@@ -136,14 +143,14 @@ public class LaunchEval {
 
 		GameEval[] result = new GameEval[n_agents];
 		
-		AtomicBoolean winnerFound = new AtomicBoolean(false);
+		AtomicBoolean stop = new AtomicBoolean(false);
 
-		Arrays.parallelSetAll(result, (i)->new GameEval(i, winnerFound));	
+		Arrays.parallelSetAll(result, (i)->new GameEval(i, stop));	
 		
 		Arrays.stream(result).parallel().forEach((GameEval ge) -> {
 			ge.setState(state);
 			if(ge.simulate(max, agentName, AGENT_TIME, new Random().nextInt(), false)) {
-				winnerFound.set(true);
+				stop.set(true);
 			}
 			System.out.print(ge.finishChar());
 		});
@@ -164,9 +171,9 @@ public class LaunchEval {
 
 		GameEval[] result = new GameEval[n_agents];
 		
-		AtomicBoolean winnerFound = new AtomicBoolean(false);
+		AtomicBoolean stop = new AtomicBoolean(false);
 
-		Arrays.parallelSetAll(result, (i)->new GameEval(i, winnerFound));
+		Arrays.parallelSetAll(result, (i)->new GameEval(i, stop));
 
 		Arrays.stream(result).parallel().forEach((GameEval ge) -> {
 			ge.setState(state);

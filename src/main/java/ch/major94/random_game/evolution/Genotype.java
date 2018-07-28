@@ -9,6 +9,7 @@ public class Genotype extends RandomElement implements Evolvable<Genotype>, Comp
 
 	private static final int NUM_CHROMOSOMES = 5;
 	private static final double STRONG_MUTATION_RATE = 0.1;
+	private static final double VERY_STRONG_MUTATION_RATE = 0.01;
 
 	private SpriteChromosome sprites;
 	private InteractionChromosome interactions;
@@ -60,6 +61,11 @@ public class Genotype extends RandomElement implements Evolvable<Genotype>, Comp
 
 	@Override
 	public void mutate() {
+		if(random.nextDouble()<VERY_STRONG_MUTATION_RATE) {
+			newInstance();
+			return;
+		}
+		
 		Chromosome<?> c = chromosomes[random.nextInt(NUM_CHROMOSOMES)];
 		if(random.nextDouble()<STRONG_MUTATION_RATE) {
 			c.newInstance();

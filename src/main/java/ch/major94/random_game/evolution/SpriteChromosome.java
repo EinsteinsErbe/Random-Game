@@ -12,7 +12,7 @@ public class SpriteChromosome extends Chromosome<String>{
 			/*"ResourcePack",*/ "Chaser", "PathChaser", "Fleeing", "RandomInertial",
 			"RandomNPC", /*"AlternateChaser", "RandomAltChaser", "PathAltChaser", "RandomPathAltChaser",*/
 			"Bomber", "RandomBomber", "Portal", "SpawnPoint", "SpriteProducer", "Door",
-			"MissileAvatar", "SpawnPointMultiSprite", "LOSChaser"
+			"SpawnPointMultiSprite", "LOSChaser"
 	};
 
 	private String[] avatars = {
@@ -44,18 +44,18 @@ public class SpriteChromosome extends Chromosome<String>{
 		replaceGene(newGene(), i);
 	}
 
-	@Override
-	public Chromosome<String> crossover(Chromosome<String> chromosome) {
-		int i = getRandonGeneI();
-		replaceGene(chromosome.getGene(i), i);
-		return this;
-	}
+//	@Override
+//	public Chromosome<String> crossover(Chromosome<String> chromosome) {
+//		int i = getRandonGeneI();
+//		replaceGene(chromosome.getGene(i), i);
+//		return this;
+//	}
 
 	@Override
 	public void newInstance() {
 		genes.clear();
 		hasAvatar = false;
-		// TODO Auto-generated method stub
+		
 		for(int i=0; i<N_SPRITES; i++) {
 			genes.add(newGene());
 		}

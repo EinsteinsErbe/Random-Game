@@ -51,7 +51,30 @@ public abstract class Chromosome<G> extends RandomElement implements Evolvable<C
 
 	@Override
 	public Chromosome<G> crossover(Chromosome<G> chromosome) {		//TODO change to single point crossover?
+		/*replace on random gene with random gene
 		replaceRandomGene(chromosome.getRandomGene());
+		return this;*/
+		
+		/*replace on random gene
+		int i = getRandonGeneI();
+		replaceGene(chromosome.getGene(i), i);
+		return this;*/
+		
+		//2-Point Crossover
+		int n = Math.min(genes.size(), chromosome.getGenes().size());
+		int first = random.nextInt(n);
+		int last = random.nextInt(n);
+		
+		if(first > last) {
+			int t = first;
+			first = last;
+			last = t;
+		}
+		
+		for(int i=first; i<=last; i++) {
+			replaceGene(chromosome.getGene(i), i);
+		}
+		
 		return this;
 	}
 
