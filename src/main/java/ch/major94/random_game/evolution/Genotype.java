@@ -16,6 +16,10 @@ public class Genotype extends RandomElement implements Evolvable<Genotype>, Comp
 	private TerminationChromosome terminations;
 	private MappingChromosome mapping;
 	private LevelChromosome level;
+	
+	public String ID = "   ";	//oldest ancestor
+	public String ID2 = "   ";	//direct ancestor
+	public String ID3 = "   ";	//personal id
 
 	private double fitness;
 
@@ -42,6 +46,16 @@ public class Genotype extends RandomElement implements Evolvable<Genotype>, Comp
 		newInstance();
 	}
 
+	private void createID() {
+		ID = buildID();
+		ID2 = ID;
+		ID3 = ID;
+	}
+	
+	private String buildID() {
+		return String.format("%1$3s", Integer.toHexString(hashCode()%4096).toUpperCase());
+	}
+
 	public Genotype(Genotype g) {
 		sprites = g.getSprites().clone();
 		interactions = g.getInteractions().clone();
@@ -57,6 +71,10 @@ public class Genotype extends RandomElement implements Evolvable<Genotype>, Comp
 		chromosomes[4] = level;
 
 		this.fitness = g.getFitness();
+		
+		this.ID = g.ID;
+		this.ID2 = g.ID3;
+		this.ID3 = buildID();
 	}
 
 	@Override
@@ -101,6 +119,7 @@ public class Genotype extends RandomElement implements Evolvable<Genotype>, Comp
 	@Override
 	public void newInstance() {
 		Arrays.stream(chromosomes).forEach(c -> c.newInstance());
+		createID();
 	}
 
 	public String[] buildGame() {
@@ -118,11 +137,11 @@ public class Genotype extends RandomElement implements Evolvable<Genotype>, Comp
 	}
 
 	public void calcFitness(long seed) {
+		System.out.print(ID+" / "+ID2+" / "+ID3+"\t");
 		try {
 			fitness = LaunchEval.eval(buildGame(), buildLevel());
 		} catch (Exception e) {
 			System.out.println("INVALID");
-			//e.printStackTrace();
 			fitness = -1;
 		}
 	}
@@ -166,7 +185,7 @@ public class Genotype extends RandomElement implements Evolvable<Genotype>, Comp
 
 	public void showDetails() {
 		System.out.println("======================================================");
-		System.out.println(this);
+		System.out.println(ID+" / "+ID2+" / "+ID3);
 		System.out.println("Fitness: "+fitness);
 		for(String s : buildGame()) {
 			System.out.println(s);
