@@ -1,15 +1,8 @@
 package ch.major94.random_game;
-import java.util.Random;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import core.game.Game;
 import core.game.StateObservation;
-import core.vgdl.VGDLFactory;
-import core.vgdl.VGDLParser;
-import core.vgdl.VGDLRegistry;
-import io.jenetics.Chromosome;
 import io.jenetics.Genotype;
 import io.jenetics.IntegerChromosome;
 import io.jenetics.IntegerGene;

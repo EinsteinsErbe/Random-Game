@@ -3,12 +3,6 @@ package ch.major94.random_game.display;
 import org.jfree.chart.ChartPanel;
 
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Random;
-
-import javax.swing.Timer;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
@@ -23,7 +17,7 @@ public class LineChart extends ApplicationFrame {
 	
 	private XYSeries series;
 
-	public LineChart( String applicationTitle , String chartTitle, String xAxis, String yAxis) {
+	public LineChart(String applicationTitle , String chartTitle, String xAxis, String yAxis) {
 		super(applicationTitle);
 
 		series = new XYSeries("Data");

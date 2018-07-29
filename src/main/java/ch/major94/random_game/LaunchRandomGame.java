@@ -2,18 +2,17 @@ package ch.major94.random_game;
 
 import core.competition.CompetitionParameters;
 import tracks.ArcadeMachine;
-import tracks.ruleGeneration.geneticRuleGenerator.SharedData;
 
 public class LaunchRandomGame {
 
 	public static void main(String[] args) {
 
 		final boolean visuals = true;
-		
+
 		String sampleOLETSController = "tracks.singlePlayer.advanced.olets.Agent";
-		
+
 		CompetitionParameters.GAMETICKS = 0;
-		
+
 		final int gen = 20;
 
 		//Use custom Game

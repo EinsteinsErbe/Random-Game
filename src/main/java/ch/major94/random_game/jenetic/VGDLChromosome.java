@@ -6,6 +6,8 @@ import io.jenetics.util.ISeq;
 
 public class VGDLChromosome extends AbstractChromosome<VGDLGene> {
 
+	private static final long serialVersionUID = 9190048843987372758L;
+
 	protected VGDLChromosome(ISeq<? extends VGDLGene> genes) {
 		super(genes);
 		// TODO Auto-generated constructor stub

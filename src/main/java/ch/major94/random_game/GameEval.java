@@ -8,7 +8,6 @@ import core.game.StateObservation;
 import core.player.AbstractPlayer;
 import ontology.Types;
 import tools.ElapsedCpuTimer;
-import tracks.ruleGeneration.geneticRuleGenerator.SharedData;
 
 public class GameEval {
 	

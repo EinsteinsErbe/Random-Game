@@ -1,6 +1,7 @@
 package ch.major94.random_game;
 
 import ch.major94.random_game.display.LineChart;
+import ch.major94.random_game.display.StackedAreaChart;
 import ch.major94.random_game.evolution.Chromosome;
 import ch.major94.random_game.evolution.Genotype;
 import core.logging.Logger;
@@ -14,17 +15,16 @@ import java.util.Random;
 
 public class LaunchRGEngine {
 
-	private static int POP_SIZE = 30;
+	private static int POP_SIZE = 5;
 	private static int N_GENERATIONS = 30;
-	private static final double uniformRate = 0.5;
 	private static final double mutationRate = 0.3;
-	private static final int tournamentSize = 5;
+	private static final int tournamentSize = 1;
 	private static final boolean elitism = true;
 
 	private static Genotype[] pop;
 
 	public static void main(String[] args) {
-		
+
 		try {
 			N_GENERATIONS = Integer.parseInt(args[0]);
 			POP_SIZE = Integer.parseInt(args[1]);
@@ -32,14 +32,21 @@ public class LaunchRGEngine {
 			// TODO: handle exception
 		}
 
-		LineChart chart = new LineChart(
+		LineChart fitnessChart = new LineChart(
 				"Random Game Evolution" ,
 				"Verlauf der Fitness",
 				"Generation",
 				"Best Fitness");
+		fitnessChart.pack();
+		fitnessChart.setVisible(true);
 
-		chart.pack( );
-		chart.setVisible( true );
+		StackedAreaChart speciesChart = new StackedAreaChart(
+				"Random Game Evolution",
+				"Spezies",
+				"Generation",
+				"Anzahl");
+		speciesChart.pack();
+		speciesChart.setVisible(true);
 
 		Chromosome.setupLists();
 		Logger.getInstance().active = false; //Disable parse errors
@@ -49,9 +56,6 @@ public class LaunchRGEngine {
 		//ArrayList<Genotype> population = new ArrayList<Genotype>(100);
 		pop = new Genotype[POP_SIZE];
 		Arrays.parallelSetAll(pop, g -> new Genotype());
-
-		System.out.println("initialized");
-		//printPop();
 
 		for (int i = 0; i <= N_GENERATIONS; i++) {
 
@@ -66,10 +70,12 @@ public class LaunchRGEngine {
 			Arrays.parallelSort(pop);
 			best = pop[POP_SIZE-1];
 			best.showDetails();
-			//TODO write game files?
+
 			writeFiles(best, i);
 			System.out.println("GENERATION "+(i)+": best fitness: "+best.getFitness());
-			chart.addData(i, best.getFitness());
+
+			fitnessChart.addData(i, best.getFitness());
+			speciesChart.addData(Arrays.stream(pop).map(g -> g.ID).toArray(String[]::new), i);
 		}
 	}
 
