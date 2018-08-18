@@ -30,6 +30,8 @@ public class GameEval {
 	public boolean simulate(int maxFrames, String agentName, int agentTime, int seed, boolean saveActions) {
 		//System.out.println("start agent "+id);
 		AbstractPlayer a;
+		
+		win = false;
 		try {
 			state.setNewSeed(seed);
 			a = createAgent(agentName, state);
@@ -48,8 +50,6 @@ public class GameEval {
 		} catch (Exception e) {
 			//e.printStackTrace();
 		}
-		win = false;
-		
 		return win;
 	}
 	

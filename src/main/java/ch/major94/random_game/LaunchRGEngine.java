@@ -15,10 +15,10 @@ import java.util.Random;
 
 public class LaunchRGEngine {
 
-	private static int POP_SIZE = 5;
+	private static int POP_SIZE = 20;
 	private static int N_GENERATIONS = 30;
-	private static final double mutationRate = 0.3;
-	private static final int tournamentSize = 1;
+	private static double mutationRate = 0.3;
+	private static int tournamentSize = 5;
 	private static final boolean elitism = true;
 
 	private static Genotype[] pop;
@@ -26,8 +26,13 @@ public class LaunchRGEngine {
 	public static void main(String[] args) {
 
 		try {
-			N_GENERATIONS = Integer.parseInt(args[0]);
-			POP_SIZE = Integer.parseInt(args[1]);
+			POP_SIZE = Integer.parseInt(args[0]);
+			N_GENERATIONS = Integer.parseInt(args[1]);
+			mutationRate = Double.parseDouble(args[2]);
+			tournamentSize  = Integer.parseInt(args[3]);
+			LaunchEval.AGENT_TIME = Integer.parseInt(args[4]);
+			LaunchEval.N_AGENTS = Integer.parseInt(args[5]);
+			System.out.println("parameters accepted");
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -129,7 +134,7 @@ public class LaunchRGEngine {
 		writeFile("generated/"+id+"level1.txt", g.buildLevel());
 	}   
 
-	private static void writeFile(String name, String[] content) {
+	public static void writeFile(String name, String[] content) {
 		try {
 			BufferedWriter bwr = new BufferedWriter(new FileWriter(new File(name), false));
 			for (String s : content) {

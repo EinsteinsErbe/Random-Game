@@ -9,12 +9,14 @@ import core.vgdl.VGDLFactory;
 import core.vgdl.VGDLParser;
 import core.vgdl.VGDLRegistry;
 import tools.IO;
+import tools.Utils;
 import tracks.ruleGeneration.geneticRuleGenerator.SharedData;
 import tracks.singlePlayer.advanced.olets.SingleMCTSPlayer;
 
 public class LaunchEval {
 
-	static int AGENT_TIME = 20;
+	
+	static int AGENT_TIME = 10;
 	static int N_AGENTS = 8;
 	static StringBuffer sb = new StringBuffer();
 
@@ -27,21 +29,42 @@ public class LaunchEval {
 	static String sampleRSController = "tracks.singlePlayer.advanced.sampleRS.Agent";
 	static String sampleRHEAController = "tracks.singlePlayer.advanced.sampleRHEA.Agent";
 	static String sampleOLETSController = "tracks.singlePlayer.advanced.olets.Agent";
+	
+	private static final int MAX_FRAMES = 1000;
+	private static final String BEST_AGENT = sampleOLETSController;
 
 	public static void main(String[] args) {
 
-		String[] game = new IO().readFile("game.txt");
-		String[] level = new IO().readFile("level.txt");
+		//Test fitness function
 
-		for(int i=10; i<=100; i+=5) {
-			//for(int j=1; j<=10; j+=5) {
+		//Load available games
+		String spGamesCollection =  "examples/all_games_sp.csv";
+		String[][] games = Utils.readGames(spGamesCollection);
+
+		for(int i=0; i<games.length; i++) {
+			String gameName = games[i][1];
+			String gameFile = games[i][0];
+			String[] game = new IO().readFile(gameFile);
+			
+			sb.append(gameName);
+
+			System.out.println(gameName);
 			for(int k=0; k<5; k++) {
-				SingleMCTSPlayer.MIN_ITER = 1;
-				AGENT_TIME = i;
-				eval(game, level);
+				String[] level = new IO().readFile(gameFile.replace(gameName, gameName + "_lvl" + k));
+				double res = 0;
+				try {
+					res = eval(game, level);
+				} catch (Exception e) {
+					
+				}
+				
+				sb.append("\t");
+				sb.append(res);
 			}
-			//}
+			sb.append("\n");
 		}
+		
+		LaunchRGEngine.writeFile("fitnessTest_RS_"+AGENT_TIME+".txt", new String[]{sb.toString()});
 	}
 
 	public static double eval(String[] game, String[] level) {
@@ -68,7 +91,7 @@ public class LaunchEval {
 		//alle in ein Array oder Liste (ohne parallelSetAll)
 		//final int parallelism = 8;
 		System.out.print("Good Player: ");
-		GameEval[] result1 = evalBestAgent(sampleOLETSController, N_AGENTS, seed, state, 500);
+		GameEval[] result1 = evalBestAgent(BEST_AGENT, N_AGENTS, seed, state, MAX_FRAMES);
 		double max = Arrays.stream(result1).parallel().mapToDouble(GameEval::getScore).max().orElse(0);
 		double win = Arrays.stream(result1).parallel().anyMatch(ge -> ge.isWin()) ? 1 : 0;
 		int frames = Arrays.stream(result1).parallel().mapToInt(GameEval::getSteps).min().orElse(0);
@@ -79,9 +102,9 @@ public class LaunchEval {
 		}
 
 		System.out.print("\tBad Player: ");
-		GameEval[] result2 = evalAvrgAgent(SharedData.RANDOM_AGENT_NAME, N_AGENTS, seed, state, 500);
+		GameEval[] result2 = evalAvrgAgent(SharedData.RANDOM_AGENT_NAME, N_AGENTS, seed, state, MAX_FRAMES);
 		double avrg = Arrays.stream(result2).parallel().mapToDouble(GameEval::getScore).average().orElse(0);
-		double avrgWin = Arrays.stream(result2).parallel().filter(ge -> ge.isWin()).count()/N_AGENTS;
+		double avrgWin = Arrays.stream(result2).parallel().filter(ge -> ge.isWin()).count()/(double)N_AGENTS;
 		System.out.print(" Result: "+avrg+"   \t"+avrgWin);
 		if(Arrays.stream(result1).parallel().anyMatch(ge -> ge.isTimeOut())) {
 			System.out.println("\t TIMEOUT");
@@ -89,9 +112,9 @@ public class LaunchEval {
 		}
 
 		System.out.print("\tIdle Player: ");
-		GameEval[] result3 = evalAvrgAgent(SharedData.DO_NOTHING_AGENT_NAME, N_AGENTS, seed, state, 500);
+		GameEval[] result3 = evalAvrgAgent(SharedData.DO_NOTHING_AGENT_NAME, N_AGENTS, seed, state, MAX_FRAMES);
 		double avrg2 = Arrays.stream(result3).parallel().mapToDouble(GameEval::getScore).average().orElse(0);
-		double avrgWin2 = Arrays.stream(result3).parallel().filter(ge -> ge.isWin()).count()/N_AGENTS;
+		double avrgWin2 = Arrays.stream(result3).parallel().filter(ge -> ge.isWin()).count()/(double)N_AGENTS;
 		System.out.print(" Result: "+avrg2+"   \t"+avrgWin2);
 		if(Arrays.stream(result1).parallel().anyMatch(ge -> ge.isTimeOut())) {
 			System.out.println("\t TIMEOUT");
@@ -111,7 +134,7 @@ public class LaunchEval {
 
 		//Bonus for getting more points than the random agents
 		if(max > 0 && max>avrg) {
-			fitness += (max-avrg)/max;
+			fitness += Math.min((max-avrg)/max, 1);
 		}
 
 		//not instant game over

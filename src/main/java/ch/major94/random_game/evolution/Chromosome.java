@@ -123,7 +123,7 @@ public abstract class Chromosome<G> extends RandomElement implements Evolvable<C
 		if(change > 0) {
 			genes.add(newGene());
 		}
-		if(change < 0) {
+		if(change < 0 && genes.size()>1) {
 			genes.remove(getRandonGeneI());
 		}	
 	}
